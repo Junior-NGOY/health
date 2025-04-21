@@ -17,10 +17,15 @@ import { getPatientNextSequence } from "@/actions/patients";
  
 
 export default async function AdmissionTabs() {
-  //const classes = (await getAllClasses()) || [];
-  //const parents = (await getAllParents()) || [];
-  const nextSequence = (await getPatientNextSequence()) || 1;
+  let nextSequence = 1;
 
+/*   try {
+    nextSequence = await getPatientNextSequence() || 1;
+  } catch (error) {
+    console.error('Error fetching next sequence:', error);
+    // Utiliser la valeur par défaut en cas d'erreur
+    nextSequence = 1;
+  } */
   
   return (
     <div className="container mx-auto p-6">
