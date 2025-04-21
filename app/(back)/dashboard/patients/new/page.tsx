@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { UserPlus, Users } from "lucide-react";
 import SinglePatientForm from "@/components/dashboard/forms/patients/patient-form";
-//import { getPatientNextSequence } from "@/actions/patients";
+import { getPatientNextSequence } from "@/actions/patients";
 //import SingleStudentForm from "@/components/dashboard/forms/students/student-form";
 //import BulkStudentForm from "@/components/dashboard/forms/students/bulk-student-form";
 //import { InfoBanner } from "@/components/ui/info-banner";
@@ -19,8 +19,8 @@ import SinglePatientForm from "@/components/dashboard/forms/patients/patient-for
 export default async function AdmissionTabs() {
   //const classes = (await getAllClasses()) || [];
   //const parents = (await getAllParents()) || [];
-  //const nextSequence = (await getPatientNextSequence()) || 1;
-  const nextSequence = 1;
+  const nextSequence = (await getPatientNextSequence()) || 1;
+
   
   return (
     <div className="container mx-auto p-6">

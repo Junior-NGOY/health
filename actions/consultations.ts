@@ -25,7 +25,7 @@ export async function getAllConsultations() {
       
       // Check if response has the expected structure
       if (!response.data || response.data.error) {
-        throw new Error(response.data?.error || "Impossible de récupérer les patients");
+        throw new Error(response.data?.error || "Impossible de récupérer les plaintes");
       }
   
       // Extract patients array from the response data structure
@@ -34,8 +34,8 @@ export async function getAllConsultations() {
   
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.message || "Erreur lors de la récupération des patients";
-        console.error("Error fetching patients:", error);
+        const message = error.response?.data?.message || "Erreur lors de la récupération des plaintes";
+        console.error("Error fetching plaintes:", error);
         return []; // Return empty array instead of throwing
       }
       console.error("Unexpected error:", error);

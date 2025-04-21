@@ -1,12 +1,14 @@
 export type PatientProps = {
+    fileNumber: string;
     title: string;
     name: string;
     firstName: string;
     lastName?: string;
     email?: string;
     gender: string;
+    bloodType: string;
     maritalStatus: string;
-    phoneNumber: string;
+    phone: string;
     dateOfBirth: string;
     nationality: string;
     admissionDate: string;
@@ -14,5 +16,5 @@ export type PatientProps = {
     emergencyContact?: string;
     profession: string;
     category: string;
-    regNo: string;
+   // regNo: string;
   };

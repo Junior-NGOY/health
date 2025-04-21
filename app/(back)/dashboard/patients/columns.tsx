@@ -109,7 +109,7 @@ export const columns: ColumnDef<Patient>[] = [
 
   {
     accessorKey: "rollNumber",
-    header: "Matricule",
+    header: "N° Doss.",
     cell: ({ row }) => {
       const rollNo = row.original;
       return (

@@ -27,7 +27,7 @@ import {
 const examsDatabase = [
   { id: "1", name: "Numération Formule Sanguine (NFS)", category: "blood" },
   { id: "2", name: "Glycémie à jeun", category: "blood" },
-  { id: "3", name: "Créatinine", category: "blood" },
+  { id: "3", name: "Cholestérole", category: "blood" },
   { id: "4", name: "Transaminases (ASAT, ALAT)", category: "blood" },
   { id: "5", name: "Radiographie thoracique", category: "imaging" },
   { id: "6", name: "Échographie abdominale", category: "imaging" },

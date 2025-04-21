@@ -6,12 +6,12 @@ import TableHeader from "@/components/dashboard/Tables/TableHeader";
 
 import { columns } from "./columns";
 import { Patient } from "@/types";
-//import { getAllPatients } from "@/actions/patients";
+import { getAllPatients } from "@/actions/patients";
 
 
 export default async function page() {
- // const patients: Patient[] = (await getAllPatients()) || [];
-  const patients: Patient[] =  [];
+  const patients: Patient[] = (await getAllPatients()) || [];
+  
   
   return (
     <div className="p-8">

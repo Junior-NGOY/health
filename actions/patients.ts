@@ -2,7 +2,7 @@
 import axios from "axios";
 import { api } from "./hospitals";
 import { PatientProps } from "@/types/props";
-//import { revalidatePath } from "next/cache";
+import { revalidatePath } from "next/cache";
  
  
 
@@ -14,12 +14,14 @@ export async function createPatient(data: PatientProps) {
     const response = await api.post("/patients", data);
     return response.data;
   } catch (error) {
-   /*  if (axios.isAxiosError(error)) {
+    console.log(error);
+    if (axios.isAxiosError(error)) {
       //type-safe error
       const message =
         error.response?.data?.message || "Failed to create patient";
-      throw new Error(message);
-    } */
+     // throw new Error(message);
+      console.log(message);
+    } 
     throw error;
   }
 }
@@ -35,7 +37,7 @@ export async function getPatientNextSequence() {
   try {
     //send the data to the api
     const response = await api.get("/patients/seq");
-    //revalidatePath("/dashboard/patients");
+   // revalidatePath("/dashboard/patients");
     const nextSeq = response.data;
     return nextSeq as number;
   } catch (error) {

@@ -28,7 +28,17 @@ export interface Patient {
     allergies?: Allergy[];
     medicalHistories?: MedicalHistory[]; */
   }
-
+  export type DiagnosisCertainty = "confirmed" | "probable" | "possible";
+  export type DiagnosisSeverity = "mild" | "moderate" | "severe";
+  
+  export interface DiagnosisData {
+    mainDiagnosis: string;
+    secondaryDiagnoses: string[];
+    differentialDiagnoses: string[];
+    notes: string;
+    certainty: DiagnosisCertainty;
+    severity: DiagnosisSeverity;
+  }
 
   export type Consultation = {
     id: string;
@@ -85,82 +95,11 @@ export interface Patient {
   }
 
   export interface AdditionalAnamnesisData {
-    familyHistory: Array<{
-      id: string;
-      relationship: string;
-      condition: string;
-      age: string;
-      status: string;
-      notes: string;
-    }>;
-    lifestyle: {
-      smoking: {
-        status: string;
-        quantity: string;
-        duration: string;
-        quitDate: string;
-        packsPerYear: number;
-      };
-      alcohol: {
-        status: string;
-        frequency: string;
-        type: string;
-        quantity: string;
-      };
-      diet: {
-        type: string;
-        restrictions: string;
-        habits: string;
-        notes: string;
-      };
-      physicalActivity: {
-        frequency: string;
-        type: string;
-        duration: string;
-        intensity: string;
-      };
-      sleep: {
-        quality: string;
-        duration: string;
-        problems: string;
-        notes: string;
-      };
-    };
-    socialHistory: {
-      occupation: {
-        current: string;
-        duration: string;
-        exposures: string;
-        schedule: string;
-      };
-      livingConditions: {
-        type: string;
-        location: string;
-        household: string;
-        dependents: string;
-      };
-      stress: {
-        level: string;
-        sources: string[];
-        copingMechanisms: string;
-      };
-    };
-    allergies: Array<{
-      id: string;
-      type: string;
-      allergen: string;
-      reaction: string;
-      severity: string;
-      diagnosis: string;
-    }>;
-    vaccinations: Array<{
-      id: string;
-      name: string;
-      date: string;
-      nextDue: string;
-      status: string;
-    }>;
-    gynecologicalHistory: GynecologicalHistory;
+    severity: string;
+    symptoms: string;
+    aggravatingFactors: string;
+    relievingFactors: string;
+    previousTreatments: string;
     travelHistory: Array<{
       id: string;
       destination: string;

@@ -104,30 +104,8 @@ export default function VitalSignsForm({ vitalSigns, setVitalSigns }: VitalSigns
             onChange={handleInputChange}
           />
         </div> */}
-        <div className="space-y-2">
-          <Label htmlFor="glycemia">Glycémie</Label>
-          <Input
-            id="glycemia"
-            name="glycemia"
-            type="number"
-            step="0.1"
-            placeholder="Entrer la glycémie"
-            value={vitalSigns.glycemia}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="cholesterol">Cholestérol</Label>
-          <Input
-            id="cholesterol"
-            name="cholesterol"
-            type="number"
-            step="0.1"
-            placeholder="Entrer le cholestérol"
-            value={vitalSigns.cholesterol}
-            onChange={handleInputChange}
-          />
-        </div>
+     
+     
         <div className="space-y-2">
           <Label htmlFor="pa">Pression artérielle</Label>
           <Input

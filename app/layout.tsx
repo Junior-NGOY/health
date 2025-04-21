@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
-import { Rethink_Sans } from 'next/font/google'
+import { inter, rethinkSans } from './fonts'
 import "./globals.css";
- 
-// If loading a variable font, you don't need to specify the font weight
-const inter = Rethink_Sans({
-  subsets: ['latin'],
-  display: 'swap',
-})
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Hospital Management",
@@ -19,10 +14,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
-      <body
-       className={inter.className}
-      >
+    <html lang="fr" className={`${inter.className} ${rethinkSans.variable}`}>
+      <body>
+        <Toaster position="top-center" reverseOrder={false} />
         {children}
       </body>
     </html>

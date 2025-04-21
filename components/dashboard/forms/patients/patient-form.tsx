@@ -69,15 +69,15 @@ export default function SinglePatientForm({
   const titles = [
     {
       label: "Mr.",
-      value: "Mr"
+      value: "MR"
     },
     {
       label: "Mme.",
-      value: "Mme"
+      value: "MRS"
     },
     {
       label: "Mlle.",
-      value: "Mlle  "
+      value: "MISS  "
     }
   ];
   //Nationality
@@ -123,9 +123,11 @@ export default function SinglePatientForm({
       setLoading(true);
       data.gender = selectedGender?.value ?? "";
       data.nationality = selectedNationality.value;
-      data.category = "INDIVIDUAL";
+      data.category = "PRIVATE";
       data.title = selectedTitle?.value ?? "";  
       data.maritalStatus = selectedMarital?.value ?? "";  
+      data.bloodType = "A_POSITIVE"; //default value
+      data.emergencyContact = "N/A"; //default value
       console.log(data);
       if (editingId) {
         /*   await updateCategoryById(editingId, data);
@@ -140,7 +142,7 @@ export default function SinglePatientForm({
       } else {
         //const rollNo = generateRollNumber();
         const regNo = generateRegistrationNumber("HOPE", "IND", nextSeq);
-        data.regNo = regNo;
+        data.fileNumber = regNo;
         console.log(data);
         const res = await createPatient(data);
         setLoading(false);
@@ -213,7 +215,7 @@ export default function SinglePatientForm({
                 register={register}
                 errors={errors}
                  label="Numéro de téléphone"
-                name="phoneNumber"
+                name="phone"
               />
               <TextInput
                 register={register}
