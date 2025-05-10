@@ -7,21 +7,21 @@ import CurrentIllness from "./current-illness";
 import AdditionalAnamnesis from "./additional-anamnesis";
 import MedicalHistory, { MedicalEvent } from "./medical-history";
 import ClinicalExams from "./clinical-exams";
-import ParaclinicalExams, { Exam } from "./paraclinical-exams";
 import Treatment from "./treatment";
 import Recommendations, { Recommendation } from "./recommendations";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Save, FileText } from "lucide-react";
 import PreviewModal from "./preview-modal";
-//import PatientInfoForm from "./patient-info-form"
 import {
   AdditionalAnamnesisData,
+  Complaint,
   Condition,
   DiagnosisCertainty,
   DiagnosisData,
   DiagnosisSeverity,
   GynecologicalHistory,
   IPatientBackground,
+  Medication,
   Patient,
   VitalSigns
 } from "@/types";
@@ -32,6 +32,11 @@ import PatientBackground from "./patient-background";
 import SaveWorkflowModal from "./save-workflow-modal";
 import PatientInfoForm from "./patient-info-form";
 import Diagnosis from "./diagnosis";
+import ParaclinicalExams, { requestedExam } from "./paraclinical-exams";
+import { getAllChefComplaints } from "@/actions/complaints";
+import toast from "react-hot-toast";
+
+//import { getAllChefComplaints } from "@/actions/consultations";
 
 async function fetchPatientInfo(patientId: string): Promise<Patient | null> {
   // Simuler une requête API
@@ -49,11 +54,8 @@ interface MedicalRecordFormProps {
     patientId?: string[];
   };
 }
-export interface RequestedExam {
-  name: string;
-  priority?: "normal" | "urgent";
-  instructions?: string;
-}
+
+
 export default function MedicalRecordForm({
   params = { patientId: undefined }
 }: MedicalRecordFormProps) {
@@ -62,21 +64,14 @@ export default function MedicalRecordForm({
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [chefComplaints, setChefComplaints] = useState<Complaint[]>([]);
   // New state to hold the resolved params
   const [resolvedParams, setResolvedParams] = useState<{
     patientId?: string[];
   } | null>(null);
   // État pour stocker les données du formulaire
   const [patientData, setPatientData] = useState({
-    patientInfo: {
-      firstName: "Jean",
-      lastName: "Dupont",
-      dob: "1975-05-15",
-      gender: "male",
-      address: "123 Rue Principale, Paris",
-      phone: "01 23 45 67 89",
-      email: "jean.dupont@email.com"
-    },
+    selectedPatient :selectedPatient as Patient,
     vitalSigns: {
       id: "1",
       staffId: "1",
@@ -86,8 +81,6 @@ export default function MedicalRecordForm({
       respirationRate: "",
       height: "",
       weight: "",
-      glycemia: "",
-      cholesterol: "",
       pa: "",
       ta: "",
       ddr: "",
@@ -101,27 +94,11 @@ export default function MedicalRecordForm({
       notes: ""
     } as VitalSigns,
     currentIllness: {
-      //chiefComplaint: "Douleurs thoraciques et essoufflement",
       chiefComplaint: "",
-      startDate: "2023-06-10",
-      severity: "moderate",
-      hma: "Le patient se plaint de douleurs thoraciques intermittentes depuis environ 2 semaines, accompagnées d'un essoufflement à l'effort modéré. Les douleurs sont décrites comme une pression, principalement localisées au centre de la poitrine, sans irradiation. Les symptômes s'aggravent à l'effort et s'améliorent au repos.",
-      symptoms: "",
-      aggravatingFactors: "",
-      relievingFactors: "",
-      previousTreatments: ""
+      startDate: "",
+      hma: "",
     },
     additionalAnamnesis: {
-      travelHistory: [
-        {
-          id: "1",
-          destination: "Afrique du Sud",
-          date: "2019",
-          duration: "2 semaines",
-          illnesses: "Aucune",
-          vaccinations: "Fièvre jaune"
-        }
-      ]
     } as AdditionalAnamnesisData,
     patientBackground: {
       conditions: [] as Condition[],
@@ -131,43 +108,42 @@ export default function MedicalRecordForm({
       medicalEvents: [] as MedicalEvent[],
       familyHistory: [
         {
-          id: "1",
-          relationship: "Père",
-          condition: "Hypertension artérielle",
-          age: "65",
-          status: "Vivant",
-          notes: "Sous traitement depuis 10 ans"
+          id: "",
+          relationship: "",
+          condition: "",
+          age: "",
+          status: "",
+          notes: ""
         },
-        {
-          id: "2",
-          relationship: "Mère",
-          condition: "Diabète type 2",
-          age: "60",
-          status: "Vivante",
-          notes: "Diagnostic il y a 5 ans"
-        }
-      ],
+      ]as Array<{
+        id: string;
+        relationship: string;
+        condition: string;
+        age: string;
+        status: string;
+        notes: string;
+      }>,
       lifestyle: {
         smoking: {
           status: "Ex-fumeur",
           quantity: "1 paquet/jour",
-          duration: "15 ans",
-          quitDate: "2020",
-          packsPerYear: 15
+         // duration: "15 ans",
+         // quitDate: "2020",
+         // packsPerYear: 15
         },
         alcohol: {
-          status: "Consommation occasionnelle",
+         // status: "Consommation occasionnelle",
           frequency: "1-2 verres/semaine",
           type: "Vin rouge",
-          quantity: "15cl/verre"
+         // quantity: "15cl/verre"
         },
         diet: {
           type: "Régime standard",
           restrictions: "Aucune",
-          habits: "3 repas par jour",
-          notes: "Tendance à la consommation excessive de sel"
+          //habits: "3 repas par jour",
+          //notes: "Tendance à la consommation excessive de sel"
         },
-        physicalActivity: {
+      /*   physicalActivity: {
           frequency: "2-3 fois/semaine",
           type: "Marche",
           duration: "30 minutes",
@@ -178,7 +154,7 @@ export default function MedicalRecordForm({
           duration: "6-7 heures",
           problems: "Réveils nocturnes occasionnels",
           notes: "Difficulté d'endormissement en période de stress"
-        }
+        } */
       },
       allergies: [
         {
@@ -187,28 +163,28 @@ export default function MedicalRecordForm({
           allergen: "Pénicilline",
           reaction: "Urticaire",
           severity: "Modérée",
-          diagnosis: "2005"
+         // diagnosis: "2005"
         }
       ],
       gynecologicalHistory: {
         menstrualHistory: null,
-        pregnancies: null,
-        contraception: null,
-        lastPapSmear: null
+        //pregnancies: null,
+       // contraception: null,
+       // lastPapSmear: null
       } as GynecologicalHistory
     },
     clinicalExams: {
       selectedOptions: {},
-      temperature: "",
-      bloodPressure: "",
-      heartRate: "",
-      respiratoryRate: "",
-      clinicalConclusion: ""
+      //temperature: "",
+      //bloodPressure: "",
+      //heartRate: "",
+      //respiratoryRate: "",
+      //clinicalConclusion: ""
     },
     paraclinicalExams: {
-      exams: [] as Exam[],
-      requestedExams: [] as RequestedExam[],
-      clinicalInfo: "",
+      requestedExams: [] as requestedExam[],
+      //requestedExams: [] as RequestedExam[],
+      //clinicalInfo: "",
       paraclinicalConclusion: ""
     },
     treatment: {
@@ -240,7 +216,7 @@ export default function MedicalRecordForm({
           route: "oral",
           instructions: "À prendre le soir"
         }
-      ],
+      ] as Medication[],
       nonPharmacological: "",
       treatmentPlan:
         "Traitement antihypertenseur et antidiabétique avec ajout d'aspirine à faible dose. Réévaluation dans 3 mois après réalisation des examens complémentaires."
@@ -327,6 +303,19 @@ export default function MedicalRecordForm({
       }, 500);
     });
   }
+ 
+  async function fetchAllChefComplaints(): Promise<Complaint[]> {
+    // Simuler une requête API pour tous les patients
+    const complaints = (await getAllChefComplaints()) || [];
+    return new Promise((resolve) => {
+      console.log(complaints)
+      setTimeout(() => {
+        resolve(complaints);
+      }, 500);
+    });
+  }  
+ 
+  
   const router = useRouter();
   const handleAddNewPatient = () => {
     router.push("/dashboard/patients/new");
@@ -334,6 +323,11 @@ export default function MedicalRecordForm({
   useEffect(() => {
     fetchAllPatients().then(setPatients);
   }, []);
+    useEffect(() => {
+    fetchAllChefComplaints().then(setChefComplaints) 
+    console.log(chefComplaints)
+  }, []);  
+  
 
   useEffect(() => {
     async function fetchInitialData() {
@@ -351,67 +345,71 @@ export default function MedicalRecordForm({
   const handleSaveConsultation = () => {
     const consultationData = {
       // Information du patient
-      patient: {
+   /*    patient: {
         ...patientData.patientInfo,
         selectedPatient
-      },
-
+      }, */
+      selectedPatient,
       // Signes vitaux
       vitalSigns: {
         ...patientData.vitalSigns,
         imc: parseFloat(patientData.vitalSigns.imc || "0")
       },
-
       // Maladie actuelle
       currentIllness: {
         ...patientData.currentIllness,
-        severity: patientData.currentIllness.severity,
-        symptoms: patientData.currentIllness.symptoms,
-        aggravatingFactors: patientData.currentIllness.aggravatingFactors,
-        relievingFactors: patientData.currentIllness.relievingFactors,
-        previousTreatments: patientData.currentIllness.previousTreatments
+        chiefComplaint: patientData.currentIllness.chiefComplaint,
+        startDate: patientData.currentIllness.startDate,
+        hma: patientData.currentIllness.hma,
       },
-
+         // Antécédents médicaux
+         medicalHistory: {
+          ...patientData.medicalHistory,
+          medicalEvents: patientData.medicalHistory.medicalEvents,
+          familyHistory: patientData.medicalHistory.familyHistory,
+          allergies: patientData.medicalHistory.allergies,
+          gynecologicalHistory: patientData.medicalHistory.gynecologicalHistory,
+        },
       // Complément d'anamnèse
       additionalAnamnesis: {
         ...patientData.additionalAnamnesis,
-
-        allergies: patientData.medicalHistory.allergies,
-
-        gynecologicalHistory: patientData.medicalHistory.gynecologicalHistory,
-        travelHistory: patientData.additionalAnamnesis.travelHistory
+        severity: patientData.additionalAnamnesis.severity,
+        symptoms: patientData.additionalAnamnesis.symptoms,
+        aggravatingFactors: patientData.additionalAnamnesis.aggravatingFactors,
+        relievingFactors: patientData.additionalAnamnesis.relievingFactors,
+        previousTreatments: patientData.additionalAnamnesis.previousTreatments,
+      
+        
       },
-
       // Terrain du patient
       patientBackground: {
         ...patientData.patientBackground,
         conditions: patientData.patientBackground.conditions,
         conditionDetails: patientData.patientBackground.conditionDetails
       },
-
-      // Antécédents médicaux
-      medicalHistory: {
-        ...patientData.medicalHistory,
-        medicalEvents: patientData.medicalHistory.medicalEvents,
-        familyHistory: patientData.medicalHistory.familyHistory
-        // allergies: patientData.medicalHistory.allergies
-      },
-
       // Examens cliniques
       clinicalExams: {
         ...patientData.clinicalExams,
         selectedOptions: patientData.clinicalExams.selectedOptions,
-        clinicalConclusion: patientData.clinicalExams.clinicalConclusion
+       // clinicalConclusion: patientData.clinicalExams.clinicalConclusion
       },
-
+          // Diagnostic
+    diagnosis: {
+      ...patientData.diagnosis,
+      mainDiagnosis: patientData.diagnosis.mainDiagnosis,
+      secondaryDiagnoses: patientData.diagnosis.secondaryDiagnoses,
+      differentialDiagnoses: patientData.diagnosis.differentialDiagnoses,
+      notes: patientData.diagnosis.notes,
+      certainty: patientData.diagnosis.certainty,
+      severity: patientData.diagnosis.severity
+    },
       // Examens paracliniques
       paraclinicalExams: {
         ...patientData.paraclinicalExams,
-        exams: patientData.paraclinicalExams.exams,
+        requestedExams: patientData.paraclinicalExams.requestedExams,
         paraclinicalConclusion:
           patientData.paraclinicalExams.paraclinicalConclusion
       },
-
       // Traitement
       treatment: {
         ...patientData.treatment,
@@ -430,9 +428,7 @@ export default function MedicalRecordForm({
         followUp: patientData.recommendations.followUp,
         additionalNotes: patientData.recommendations.additionalNotes
       },
-
-      // Diagnostic et certificat
-      diagnosis: patientData.diagnosis,
+      // certificat
       certificate: patientData.certificate,
 
       // Métadonnées de la consultation
@@ -442,30 +438,29 @@ export default function MedicalRecordForm({
         status: "completed"
       }
     };
-
     // Afficher les données dans la console
     console.log("=== DONNÉES DE LA CONSULTATION ===");
     console.log(JSON.stringify(consultationData, null, 2));
-
     return consultationData;
+    toast.success("Successfully Created!");
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardContent className="p-6">
+    <div className="space-y-6 p-2 sm:p-4 md:p-6">
+      <Card className="w-full">
+        <CardContent className="p-2 sm:p-4 md:p-6">
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
             className="w-full"
           >
             <div className="overflow-x-auto pb-2">
-              <TabsList className="w-full justify-start">
+              <TabsList className="w-full justify-start flex-wrap gap-2">
                 {tabs.map((tab) => (
                   <TabsTrigger
                     key={tab.id}
                     value={tab.id}
-                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                    className="text-xs sm:text-sm md:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                   >
                     {tab.label}
                   </TabsTrigger>
@@ -497,6 +492,7 @@ export default function MedicalRecordForm({
                   updateFormData("currentIllness", data)
                 }
               />
+              
             </TabsContent>
 
             <TabsContent value="additional-anamnesis" className="mt-6">
@@ -564,7 +560,7 @@ export default function MedicalRecordForm({
             </TabsContent>
           </Tabs>
 
-          <div className="flex justify-between mt-8">
+          <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8">
             <Button
               variant="outline"
               onClick={goToPreviousTab}
@@ -574,7 +570,7 @@ export default function MedicalRecordForm({
               <ChevronLeft className="h-4 w-4" /> Précédent
             </Button>
 
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <Button
                 variant="outline"
                 className="flex items-center gap-2"
@@ -584,7 +580,7 @@ export default function MedicalRecordForm({
               </Button>
               <Button
                 variant="outline"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 w-full sm:w-auto"
                 onClick={() => {
                   handleSaveConsultation();
                   setSaveModalOpen(true);
@@ -593,11 +589,10 @@ export default function MedicalRecordForm({
                 <Save className="h-4 w-4" /> Enregistrer
               </Button>
             </div>
-
             <Button
               onClick={goToNextTab}
               disabled={currentTabIndex === tabs.length - 1}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full sm:w-auto"
             >
               Suivant <ChevronRight className="h-4 w-4" />
             </Button>
@@ -605,17 +600,25 @@ export default function MedicalRecordForm({
         </CardContent>
       </Card>
 
-      {/*     <PreviewModal
+        <PreviewModal
         open={previewModalOpen}
         onOpenChange={setPreviewModalOpen}
-        patientData={patientData}
-      /> */}
+        patientData={{
+          patientInfo: selectedPatient, // Make sure this matches
+          ...patientData
+        }}
+        className="w-full max-w-4xl mx-auto"
+      /> 
 
-      {/*    <SaveWorkflowModal
-        open={saveModalOpen}
-        onOpenChange={setSaveModalOpen}
-        patientData={patientData}
-      /> */}
+<SaveWorkflowModal
+  open={saveModalOpen}
+  onOpenChange={setSaveModalOpen}
+  patientData={{
+    patientInfo: selectedPatient, // Make sure this matches
+    ...patientData
+  }}
+  className="w-full max-w-2xl mx-auto"
+/>  
     </div>
   );
 }

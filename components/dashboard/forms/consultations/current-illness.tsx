@@ -23,8 +23,10 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useEffect, useState } from "react";
 import FormSelectInput from "@/components/FormInputs/FormSelectInput";
-import { getAllChefComplaints } from "@/actions/consultations";
+//import { getAllChefComplaints } from "@/actions/consultations";
 import { Complaint } from "@/types";
+import { getAllChefComplaints } from "@/actions/complaints";
+ 
 
 export type SelectOptionProps = {
   label: string;
@@ -39,6 +41,15 @@ interface CurrentIllnessProps {
   formData: CurrentIllnessFormData;
   updateFormData: (data: Partial<CurrentIllnessFormData>) => void;
 }
+// Mock data for complaints
+/* const mockComplaints: Complaint[] = [
+  { id: "1", description: "Fièvre" },
+  { id: "2", description: "Douleurs abdominales" },
+  { id: "3", description: "Maux de tête" },
+  { id: "4", description: "Toux" },
+  { id: "5", description: "Fatigue" },
+]; */
+
 export default function CurrentIllness({
   formData,
   updateFormData
@@ -58,12 +69,50 @@ export default function CurrentIllness({
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    getAllChefComplaints().then((data) => {
-      setComplaints(data);
-      setIsLoading(false);
-    });
-  }, []);
+     useEffect(() => {
+    let mounted = true;
+
+    async function fetchComplaints() {
+      try {
+        const data = await fetchAllChefComplaints();
+        if (mounted) {
+          setComplaints(data);
+        }
+      } catch (error) {
+        console.error('Error fetching complaints:', error);
+        if (mounted) {
+          setComplaints(complaints);
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    fetchComplaints();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);  
+
+
+   async function fetchAllChefComplaints(): Promise<Complaint[]> {
+    try {
+      const complaints = await getAllChefComplaints();
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          // If API returns data use it, otherwise use mock data
+          resolve(complaints?.length ? complaints : complaints);
+        }, 500);
+      });
+    } catch (error) {
+      console.error('Error in fetchAllChefComplaints:', error);
+      // Return mock data as fallback
+      return Promise.resolve(complaints);
+    }
+  }  
 
   const complaintOptions = complaints?.map((complaint) => ({
     value: complaint?.id || "",
@@ -78,7 +127,15 @@ export default function CurrentIllness({
   const handleHmaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     updateFormData({ hma: e.target.value });
   };
-
+  // Ajout du gestionnaire de changement de plainte
+  const handleComplaintChange = (option: SelectOptionProps | null) => {
+    setSelectedComplaintOption(option);
+    if (option) {
+      updateFormData({ 
+        chiefComplaint: option.label 
+      });
+    }
+  };
   return (
     <Card>
       <CardHeader>
@@ -89,18 +146,17 @@ export default function CurrentIllness({
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {isLoading}
+        
           <div className="space-y-2 md:col-span-2">
-            <FormSelectInput
+          <FormSelectInput
               label="Plainte principale"
               options={complaintOptions}
               option={selectedComplaintOption || { label: "", value: "" }}
-              setOption={setSelectedComplaintOption}
-              //setOption={handleComplaintChange}
+              setOption={handleComplaintChange}  // Utiliser le nouveau gestionnaire
               toolTipText="Ajouter une nouvelle plainte"
-              href="/dashboard/patients/new" // Ajouter un lien vers la page de création de patient
-              className="w-full "
-              // isLoading={isLoading}
+              href="/dashboard/complaints/new"
+              className="w-full"
+              isLoading={isLoading}  // Décommenter isLoading
             />
             {selectedComplaintOption && (
               <div className="mt-2 p-3 bg-muted rounded-md">

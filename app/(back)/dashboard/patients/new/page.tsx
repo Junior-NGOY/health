@@ -9,23 +9,27 @@ import {
 import { UserPlus, Users } from "lucide-react";
 import SinglePatientForm from "@/components/dashboard/forms/patients/patient-form";
 import { getPatientNextSequence } from "@/actions/patients";
+import { Metadata } from "next";
 //import SingleStudentForm from "@/components/dashboard/forms/students/student-form";
 //import BulkStudentForm from "@/components/dashboard/forms/students/bulk-student-form";
 //import { InfoBanner } from "@/components/ui/info-banner";
 //import { getAllClasses } from "@/actions/classes";
 //import { getAllParents } from "@/actions/parents";
  
-
+export const metadata: Metadata = {
+  title: "Nouvelle Admission | Patients",
+  description: "Formulaire d'admission d'un nouveau patient"
+}
 export default async function AdmissionTabs() {
-  let nextSequence = 1;
-
-/*   try {
-    nextSequence = await getPatientNextSequence() || 1;
+  let nextSequence: number
+  
+  try {
+    nextSequence = await getPatientNextSequence()
   } catch (error) {
-    console.error('Error fetching next sequence:', error);
-    // Utiliser la valeur par défaut en cas d'erreur
-    nextSequence = 1;
-  } */
+    console.error("Failed to get next sequence:", error)
+    nextSequence = 1 // fallback value
+  }
+
   
   return (
     <div className="container mx-auto p-6">

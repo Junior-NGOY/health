@@ -19,91 +19,139 @@ import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Recommendation } from "./recommendations"
-import { Exam } from "./paraclinical-exams"
-import { RequestedExam } from "./medical-record-form"
-import { AdditionalAnamnesisData, IPatientBackground, VitalSigns } from "@/types"
+import { AdditionalAnamnesisData, Condition, DiagnosisCertainty, DiagnosisSeverity, IPatientBackground, Patient, VitalSigns } from "@/types"
 import { MedicalEvent } from "./medical-history"
+import { requestedExam } from "./paraclinical-exams"
 
 
 interface ISaveWorkflowModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   patientData: {
-    patientInfo: {
-      firstName: string;
-      lastName: string;
-      dob: string;
-      gender: string;
-      address: string;
-      phone: string;
-      email: string;
-    };
+    patientInfo: Patient|null;
     vitalSigns: VitalSigns;
-    currentIllness: {
-      chiefComplaint: string;
-      startDate: string;
-      severity: string;
-      illnessDescription: string;
-      symptoms: string;
-      aggravatingFactors: string;
-      relievingFactors: string;
-      previousTreatments: string;
-    };
-    additionalAnamnesis: AdditionalAnamnesisData;
-    patientBackground: IPatientBackground;
-    medicalHistory: {
-      medicalEvents: MedicalEvent[];
-      familyHistory: string;
-      allergies: string;
-    };
-    clinicalExams: {
-      selectedOptions: Record<string, boolean>;
-      temperature: string;
-      bloodPressure: string;
-      heartRate: string;
-      respiratoryRate: string;
-      clinicalConclusion: string;
-    };
-    paraclinicalExams: {
-      exams: Exam[];
-      requestedExams: RequestedExam[];
-      clinicalInfo: string;
-      paraclinicalConclusion: string;
-    };
-    treatment: {
-      medications: Array<{
-        id: string;
-        name: string;
-        dosage: string;
-        frequency: string;
-        duration: string;
-        route: string;
-        instructions: string;
-      }>;
-      nonPharmacological: string;
-      treatmentPlan: string;
-    };
-    recommendations: {
-      recommendations: Recommendation[];
-      dietaryMeasures: string;
-      physicalActivity: string;
-      restrictions: string;
-      followUp: string;
-      additionalNotes: string;
-    };
-    diagnosis: string;
-    certificate: {
-      content: string;
-    };
+ currentIllness: {
+     chiefComplaint: string;
+     startDate: string;
+     hma: string;
+     //severity: string;
+     //symptoms: string;
+     //aggravatingFactors: string;
+     //relievingFactors: string;
+     //previousTreatments: string;
+   };
+   patientBackground: {
+     conditions: Condition[];
+     conditionDetails: string;
+   };
+   medicalHistory: {
+     medicalEvents: MedicalEvent[];
+     familyHistory  : Array<{
+       id: string;
+       relationship: string;
+       condition: string;
+       age: string;
+       status: string;
+       notes: string;
+     }>;
+     lifestyle: {
+       smoking: {
+         status: string
+         quantity: string
+       },
+       alcohol: {
+         frequency: string;
+         type: string;
+       },
+       diet: {
+         type: string
+         restrictions:string
+   
+       },
+  
+     },
+     allergies: Array< {
+       id: string;
+       type: string;
+       allergen: string;
+       reaction: string;
+       severity: string;
+      // diagnosis: "2005"
+     }>;
+   };
+   clinicalExams: {
+     selectedOptions: Record<string, boolean>;
+     //temperature: string;
+     //bloodPressure: string;
+     //heartRate: string;
+     //respiratoryRate: string;
+     //clinicalConclusion: string;
+   };
+   paraclinicalExams: {
+     requestedExams: requestedExam[];
+     //requestedExams: RequestedExam[];
+    // clinicalInfo: string;
+     paraclinicalConclusion?: string;
+   };
+   treatment: {
+     medications: Array<{
+       id: string;
+       name: string;
+       dosage: string;
+       frequency: string;
+       duration: string;
+       route: string;
+       instructions: string;
+     }>;
+     nonPharmacological: string;
+     treatmentPlan: string;
+   };
+   recommendations: {
+     recommendations: Recommendation[];
+     dietaryMeasures: string;
+     physicalActivity: string;
+     restrictions: string;
+     followUp: string;
+     additionalNotes: string;
+   };
+   diagnosis: {
+     mainDiagnosis: string;
+     secondaryDiagnoses: string[];
+     differentialDiagnoses: string[];
+     notes: string;
+     certainty: DiagnosisCertainty;
+     severity: DiagnosisSeverity;
+   };
+   certificate: {
+     content: string;
+   };
   };
+  className?: string;
 }
-export default function SaveWorkflowModal({ open, onOpenChange }: ISaveWorkflowModalProps) {
+export default function SaveWorkflowModal({ open, onOpenChange,patientData  }: ISaveWorkflowModalProps) {
   const [progress, setProgress] = useState(0)
   const [currentStep, setCurrentStep] = useState(0)
   const [isComplete, setIsComplete] = useState(false)
   const [selectedServices, setSelectedServices] = useState<string[]>([])
   const [followUpDate, setFollowUpDate] = useState("")
 
+  if (!patientData.patientInfo) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Attention</DialogTitle>
+            <DialogDescription>
+              Veuillez d'abord sélectionner un patient avant de sauvegarder.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => onOpenChange(false)}>Fermer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
   // Simuler le processus d'enregistrement
   const startSaveProcess = () => {
     setProgress(0)
@@ -151,7 +199,8 @@ export default function SaveWorkflowModal({ open, onOpenChange }: ISaveWorkflowM
   const handleSave = () => {
     startSaveProcess()
   }
-
+  // Vérification si patientInfo existe
+ 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
@@ -182,7 +231,7 @@ export default function SaveWorkflowModal({ open, onOpenChange }: ISaveWorkflowM
                     htmlFor="exams"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2"
                   >
-                    <Clipboard className="h-4 w-4" /> Demande d&apos,examens
+                    <Clipboard className="h-4 w-4" /> Demande d'examens
                   </label>
                 </div>
 

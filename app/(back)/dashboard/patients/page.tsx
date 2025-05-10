@@ -10,8 +10,7 @@ import { getAllPatients } from "@/actions/patients";
 
 
 export default async function page() {
-  //const patients: Patient[] = (await getAllPatients()) || [];
-  const patients: Patient[] =  [];
+  const patients: Patient[] = (await getAllPatients()) || [];
   
   
   return (

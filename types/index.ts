@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export interface Patient {
     id: string;
     fileNumber: string;
@@ -125,8 +127,70 @@ export interface Patient {
   export type Complaint = {
     id: string;
     description: string;
-    slug: string;
-    createdAt: Date;
-    updatedAt: Date;
-    consultations: Consultation[];
+   // slug: string;
+    //createdAt: Date;
+    //updatedAt: Date;
+    //consultations: Consultation[];
   };
+ export interface Category {
+    id: string;
+    name: string;
+    description?: string;
+    parentCategoryId?: string|null;
+    subCategories?: Category[];
+  }
+ export interface Supplier {
+    id: string;
+    name: string;
+   
+  }
+
+ export type Medication = {
+    id: string;
+    name: string;
+    genericName?: string | null;
+    form?: string;
+    strength?: string;
+    fabricant?: string | null;
+    description: string | null;
+    stock?: number;
+    unitPrice?: number;
+    sellingPrice?: number;
+    dosage: string;
+    frequency: string;
+    duration: string;
+    route: string;
+    
+    instructions: string;
+    category?: {
+      id: string
+      name: string
+    } | null
+    supplier?: {
+      id: string
+      name: string
+    } | null
+    createdAt: string;
+  };
+
+
+/* export interface Medication {
+    id: string;
+    name: string;
+    category: string;
+  } */
+  export const medicationFormSchema = z.object({
+    name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
+    genericName: z.string().optional(),
+    form: z.string(),
+    strength: z.string(),
+    fabricant: z.string().optional(),
+    description: z.string().optional(),
+    stock: z.number().min(0, "Le stock ne peut pas être négatif"),
+    unitPrice: z.number().min(0, "Le prix unitaire ne peut pas être négatif"),
+    sellingPrice: z.number().min(0, "Le prix de vente ne peut pas être négatif"),
+    categoryId: z.string().optional(),
+    supplierId: z.string().optional(),
+  })
+  
+  export type MedicationFormValues = z.infer<typeof medicationFormSchema> 

@@ -23,10 +23,10 @@ const examsDatabase = [
       "Cheveux roux et cassant",
       "Conjonctives palpebrales : coloré, pale",
       "Conjonctives bulbaires : aniterique, icterique",
-      "Pupilles : isocoriques, anisocoriques",
-      "Reflexe photomoteur : présent, absent",
-      "Cou : souple, raide",
-      "Thyroïde : normale, augmentée de volume",
+      "Langue sans particularité, saburale, rotie",
+      "Amygdale: sans particularité, augmente de volume, hyperemie, autres",
+      "dent sans particularité",
+      "turgence ou aturgence ou  absence de turgence de veines jugulaires, adenopathies augmente de volume ou pas autres",
     ],
   },
   {
@@ -34,28 +34,33 @@ const examsDatabase = [
     name: "Thorax",
     options: [
       "Symétrique",
-      "Asymétrique",
+      "Asymétrique thoracique",
       "Bonne ampliation thoracique",
-      "Ampliation thoracique limitée",
-      "Murmure vésiculaire pur",
-      "Râles crépitants",
-      "Râles sibilants",
-      "Frottements pleuraux",
+      "Submatite",
+      "Tympanisme de l'hemie thorax droite ou gauche",
+      "Murmure vésiculaire pure",
+      "Tumefaction de l'hemie thorax droit ou gauche",
+      "Matite",
+      "Augmentation ou diminution de vibration vocale rale crépitant",
+      "Sous crépitants",
+      "Ronflant",
     ],
   },
   {
     id: "abdomen",
     name: "Abdomen",
     options: [
-      "Souple",
-      "Tendu",
-      "Dépressible",
-      "Défense",
-      "Contracture",
-      "Douloureux à la palpation",
-      "Indolore",
-      "Bruits hydro-aériques présents",
-      "Bruits hydro-aériques absents",
+      "Normo-tendue",
+      "Souple et sans Orano-mégalie",
+      "Abdomen distendu",
+      "Sensibilité diffuse",
+      "Sensibilité épigastrique du flanc droit ou gauche ou bilaterale",
+      "Fosse iliaque droit ou gauche ou bilaterale",
+      "Hypogastrique",
+      "Sensibilité lombaire droite ou gauche ou bilaterale",
+      "Masse au niveau du flanc droit ou gauche",
+      "Hepathomegalie",
+      "Splenomegalie",
     ],
   },
   {
@@ -71,6 +76,7 @@ const examsDatabase = [
       "Réflexes normaux",
       "Réflexes diminués",
       "Réflexes absents",
+      "Sans particularité"
     ],
   },
   {
@@ -88,37 +94,37 @@ const examsDatabase = [
       "Réflexes absents",
       "Œdèmes",
       "Signes de phlébite",
+      "Sans particularité"
     ],
   },
   {
     id: "toucher-rectal",
     name: "Toucher rectal",
     options: [
-      "Sphincter tonique",
-      "Sphincter hypotonique",
-      "Prostate normale",
-      "Prostate hypertrophiée",
-      "Prostate douloureuse",
-      "Prostate nodulaire",
-      "Présence de sang",
-      "Absence de sang",
-      "Douleur à l'examen",
-      "Examen indolore",
+      "Prostate de surface lisse",
+      "Régulière",
+      "Consistance élastique",
+      "Présence du sillon median et non sensible",
+      "Prostate non palpable, sensible",
+      "Prostate augmente de volume, absence du sillon médian, consistence ferme et non sensible",
+      "Prostate augmentée du volume, consistance dure ou pierreuse, avec ou sans nodule au niveua de lobe droit ou gauche, tonicite du spincter anale, avec ou sans nodule au niveau de lobe droit ou gauche, tonicite du spincter anale",
+      "absence de la tonicite du sphincter anale doigtiesence de la tonicite du sphinter anale",
+      "Doigtier propre, teinte de sang de matière fecale, d'urine",
+      "Sans particularité",
     ],
   },
   {
     id: "toucher-vaginal",
     name: "Toucher vaginal",
     options: [
-      "Col utérin normal",
-      "Col utérin inflammatoire",
-      "Utérus de taille normale",
-      "Utérus augmenté de volume",
-      "Annexes libres",
-      "Masse annexielle",
-      "Douleur à la mobilisation utérine",
-      "Absence de douleur",
-      "Leucorrhées présentes",
+      "Pas de sensibilité toucher vaginal",
+      "Une brèche sur la face antérieur ou postérieure du vagine",
+      "Doigtier propre",
+      "Leucorrhee blanchâtre",
+      "Jaunâtre",
+      "Verdatre",
+      "Teinte de sang d'urine",
+      "Matières fecales",
       "Leucorrhées absentes",
     ],
   },
@@ -126,23 +132,29 @@ const examsDatabase = [
     id: "conclusion",
     name: "Conclusion",
     options: [
-      "Examen normal",
-      "Anomalies mineures",
-      "Anomalies significatives",
-      "Nécessite des examens complémentaires",
-      "Nécessite une consultation spécialisée",
-      "Nécessite une hospitalisation",
+      "Hypertrophie benigne de la prostate",
+      "Cancer de la prostate",
+      "Tumeur de rein (droit ou gauche)",
+      "Tumeur de la vessie",
+      "Tumeur de l'urètre",
+      "Tumeur de la verge",
+      "Pyelonephrite (droit ou gauche) simple ou compliqué",
+      "Sur un terrain de grossesse",
+      "Diabète",
+      "HTA",
+      "Immunodepression",
+      "Fistule vesico vaginale",
     ],
   },
 ]
 interface ClinicalExamsProps {
   formData: {
     selectedOptions: Record<string, string[]>;
-    temperature: string;
-    bloodPressure: string;
-    heartRate: string;
-    respiratoryRate: string;
-    clinicalConclusion: string;
+    //temperature: string;
+    //bloodPressure: string;
+   // heartRate: string;
+    //respiratoryRate: string;
+    //clinicalConclusion: string;
   };
   updateFormData: (data: Partial<ClinicalExamsProps['formData']>) => void;
 }

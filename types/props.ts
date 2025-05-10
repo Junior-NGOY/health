@@ -18,3 +18,6 @@ export type PatientProps = {
     category: string;
    // regNo: string;
   };
+
+  export type ConsultationProps = {
+    patientId: string;      }

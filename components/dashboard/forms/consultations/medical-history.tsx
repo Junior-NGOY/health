@@ -53,23 +53,23 @@ interface MedicalHistoryProps {
       smoking: {
         status: string;
         quantity: string;
-        duration: string;
-        quitDate: string;
-        packsPerYear: number;
+        //duration: string;
+        //quitDate: string;
+        //packsPerYear: number;
       };
       alcohol: {
-        status: string;
+       // status: string;
         frequency: string;
         type: string;
-        quantity: string;
+       // quantity: string;
       };
       diet: {
         type: string;
         restrictions: string;
-        habits: string;
-        notes: string;
+        //habits: string;
+        //notes: string;
       };
-      physicalActivity: {
+     /*  physicalActivity: {
         frequency: string;
         type: string;
         duration: string;
@@ -80,7 +80,7 @@ interface MedicalHistoryProps {
         duration: string;
         problems: string;
         notes: string;
-      };
+      }; */
     };
     allergies: Array<{
       id: string;
@@ -88,7 +88,7 @@ interface MedicalHistoryProps {
       allergen: string;
       reaction: string;
       severity: string;
-      diagnosis: string;
+      //diagnosis: string;
     }>;
     gynecologicalHistory: GynecologicalHistory ;
   };
@@ -107,23 +107,23 @@ interface MedicalHistoryProps {
         smoking: {
           status: string;
           quantity: string;
-          duration: string;
-          quitDate: string;
-          packsPerYear: number;
+         // duration: string;
+         // quitDate: string;
+         // packsPerYear: number;
         };
         alcohol: {
-          status: string;
+         // status: string;
           frequency: string;
           type: string;
-          quantity: string;
+         // quantity: string;
         };
         diet: {
           type: string;
           restrictions: string;
-          habits: string;
-          notes: string;
+          //habits: string;
+          //notes: string;
         };
-        physicalActivity: {
+       /*  physicalActivity: {
           frequency: string;
           type: string;
           duration: string;
@@ -134,7 +134,7 @@ interface MedicalHistoryProps {
           duration: string;
           problems: string;
           notes: string;
-        };
+        }; */
       };
       allergies: Array<{
         id: string;
@@ -142,7 +142,7 @@ interface MedicalHistoryProps {
         allergen: string;
         reaction: string;
         severity: string;
-        diagnosis: string;
+        //diagnosis: string;
       }>;
       gynecologicalHistory: GynecologicalHistory;
     }>
@@ -230,7 +230,7 @@ export default function MedicalHistory({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Antécédents Médicaux</CardTitle>
+        <CardTitle>Antécédents</CardTitle>
         <CardDescription>
           Historique médical du patient et de sa famille
         </CardDescription>

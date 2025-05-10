@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
@@ -25,16 +27,12 @@ import {
 
 // Simulated database of paraclinical examinations
 const examsDatabase = [
-  { id: "1", name: "Numération Formule Sanguine (NFS)", category: "blood" },
-  { id: "2", name: "Glycémie à jeun", category: "blood" },
-  { id: "3", name: "Cholestérole", category: "blood" },
-  { id: "4", name: "Transaminases (ASAT, ALAT)", category: "blood" },
-  { id: "5", name: "Radiographie thoracique", category: "imaging" },
-  { id: "6", name: "Échographie abdominale", category: "imaging" },
-  { id: "7", name: "Scanner cérébral", category: "imaging" },
-  { id: "8", name: "Électrocardiogramme (ECG)", category: "cardio" },
-  { id: "9", name: "Test de grossesse", category: "other" },
-  { id: "10", name: "Analyse d'urine", category: "other" },
+  { id: "1", name: "Sang", category: "blood" },
+  { id: "2", name: "Badelette Urinaire (BU)", category: "blood" },
+  { id: "3", name: "Tomodencytometrie (TDM) ou Uroscanner", category: "blood" },
+  { id: "4", name: "Imagerie par raisonnace magnetique (IRM)", category: "blood" },
+  { id: "5", name: "Urographie intraveineuse", category: "imaging" },
+  { id: "6", name: "Uretro-Cystographie retrograde", category: "imaging" },
 ]
 
 // Laboratoires et centres d'imagerie fictifs
@@ -47,42 +45,46 @@ const medicalFacilities = [
 
 export type ExamStatus = "prescribed" | "pending" | "completed" | "cancelled"
 
-export interface Exam {
-  id: string;
-  name: string;
-  prescriptionDate: string;
-  expectedDate?: string;
-  completionDate?: string;
-  result?: string;
-  category: string;
-  status: ExamStatus;
-  priority?: "normal" | "urgent";
-  facility?: string;
-  instructions?: string;
+export interface requestedExam {
+  id: string
+  name: string
+  prescriptionDate: string
+  expectedDate?: string
+  completionDate?: string
+  result?: string
+  category: string
+  status: ExamStatus
+  priority?: "normal" | "urgent"
+  facility?: string
+  instructions?: string
 }
 interface ParaclinicalExamsProps {
   formData: {
-    exams: Exam[];
-    paraclinicalConclusion: string;
-  };
-  updateFormData: (data: Partial<{
-    exams: Exam[];
-    paraclinicalConclusion: string;
-  }>) => void;
+    requestedExams: requestedExam[]
+    paraclinicalConclusion: string
+  }
+  updateFormData: (
+    data: Partial<{
+      requestedExams: requestedExam[]
+      paraclinicalConclusion: string
+    }>,
+  ) => void
 }
 export default function ParaclinicalExams({ formData, updateFormData }: ParaclinicalExamsProps) {
   const [activeTab, setActiveTab] = useState("prescribe")
   const [openExamSelector, setOpenExamSelector] = useState(false)
   const [openFacilitySelector, setOpenFacilitySelector] = useState(false)
-  //const [exams, setExams] = useState<Exam[]>([])
-  const [newExam, setNewExam] = useState<Partial<Exam>>({
+  const [newExam, setNewExam] = useState<Partial<requestedExam>>({
     name: "",
     prescriptionDate: new Date().toISOString().split("T")[0],
     category: "",
     status: "prescribed",
     priority: "normal",
+    expectedDate: "",
+    facility: "",
+    instructions: "",
   })
-  const [selectedExam, setSelectedExam] = useState<Exam | null>(null)
+  const [selectedExam, setSelectedExam] = useState<requestedExam | null>(null)
   const [isResultDialogOpen, setIsResultDialogOpen] = useState(false)
 
   const handleSelectExam = (exam: { id: string; name: string; category: string }) => {
@@ -104,7 +106,7 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
 
   const handleAddExam = () => {
     if (newExam.name) {
-      const exam: Exam = {
+      const requestedExam: requestedExam = {
         id: Date.now().toString(),
         name: newExam.name,
         prescriptionDate: newExam.prescriptionDate || new Date().toISOString().split("T")[0],
@@ -117,7 +119,7 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
       }
 
       updateFormData({
-        exams: [...formData.exams, exam]
+        requestedExams: [...formData.requestedExams, requestedExam],
       })
       setNewExam({
         name: "",
@@ -125,49 +127,55 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
         category: "",
         status: "prescribed",
         priority: "normal",
+        expectedDate: "",
+        facility: "",
+        instructions: "",
       })
     }
   }
 
   const handleRemoveExam = (id: string) => {
     updateFormData({
-      exams: formData.exams.filter((exam) => exam.id !== id)
+      requestedExams: formData.requestedExams.filter((RequestedExam) => RequestedExam.id !== id),
     })
   }
 
   const handleUpdateExamStatus = (id: string, status: ExamStatus) => {
     updateFormData({
-      exams: formData.exams.map((exam) => {
-        if (exam.id === id) {
-          return { ...exam, status }
+      requestedExams: formData.requestedExams.map((requestedExam) => {
+        if (requestedExam.id === id) {
+          return { ...requestedExam, status }
         }
-        return exam
-      })
+        return requestedExam
+      }),
     })
   }
 
-  const handleAddResult = (exam: Exam) => {
-    setSelectedExam(exam)
+  const handleAddResult = (exam: requestedExam) => {
+    setSelectedExam({
+      ...exam,
+      completionDate: exam.completionDate || new Date().toISOString().split("T")[0],
+      result: exam.result || "",
+    })
     setIsResultDialogOpen(true)
   }
 
   const handleSaveResult = () => {
-    if (selectedExam) {
-      updateFormData({
-        exams: formData.exams.map((exam) => {
-          if (exam.id === selectedExam.id) {
-            return {
-              ...selectedExam,
-              status: "completed",
-              completionDate: selectedExam.completionDate || new Date().toISOString().split("T")[0],
-            }
-          }
-          return exam
-        })
-      })
-      setIsResultDialogOpen(false)
-      setSelectedExam(null)
+    if (!selectedExam) return
+
+    const updatedExam = {
+      ...selectedExam,
+      status: "completed" as const,
+      completionDate: selectedExam.completionDate || new Date().toISOString().split("T")[0],
+      result: selectedExam.result || "",
     }
+
+    updateFormData({
+      requestedExams: formData.requestedExams.map((exam) => (exam.id === updatedExam.id ? updatedExam : exam)),
+    })
+
+    setIsResultDialogOpen(false)
+    setSelectedExam(null)
   }
 
   const getStatusBadge = (status: ExamStatus) => {
@@ -214,7 +222,7 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
   }
 
   const printPrescription = () => {
-    const prescribedExams = formData.exams.filter((exam) => exam.status === "prescribed")
+    const prescribedExams = formData.requestedExams.filter((requestedExam) => requestedExam.status === "prescribed")
     if (prescribedExams.length === 0) {
       alert("Aucun examen prescrit à imprimer.")
       return
@@ -224,11 +232,12 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
     // Pour cet exemple, nous allons simplement afficher un message
     alert("Impression de l'ordonnance pour " + prescribedExams.length + " examens.")
   }
-/*   const handleConclusionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleConclusionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     updateFormData({
-      paraclinicalConclusion: e.target.value
+      paraclinicalConclusion: e.target.value,
     })
-  } */
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -351,16 +360,16 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
 
               <div className="flex items-center gap-2">
                 <Button onClick={handleAddExam} className="flex items-center gap-2" disabled={!newExam.name}>
-                  <Plus className="h-4 w-4" /> Ajouter à l&apos,ordonnance
+                  <Plus className="h-4 w-4" /> Ajouter à l&apos;ordonnance
                 </Button>
 
                 <Button variant="outline" className="flex items-center gap-2" onClick={printPrescription}>
-                  <Printer className="h-4 w-4" /> Imprimer l&apos,ordonnance
+                  <Printer className="h-4 w-4" /> Imprimer l&apos;ordonnance
                 </Button>
               </div>
             </div>
 
-            {formData.exams.filter((e) => e.status === "prescribed").length > 0 && (
+            {formData.requestedExams.filter((e) => e.status === "prescribed").length > 0 && (
               <div className="rounded-md border">
                 <Table>
                   <TableHeader>
@@ -374,20 +383,20 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {formData.exams
+                    {formData.requestedExams
                       .filter((e) => e.status === "prescribed")
-                      .map((exam) => (
-                        <TableRow key={exam.id}>
-                          <TableCell>{exam.name}</TableCell>
-                          <TableCell>{exam.prescriptionDate}</TableCell>
-                          <TableCell>{exam.expectedDate || "-"}</TableCell>
-                          <TableCell>{getPriorityBadge(exam.priority || "normal")}</TableCell>
-                          <TableCell>{exam.facility || "-"}</TableCell>
+                      .map((requestedExam) => (
+                        <TableRow key={requestedExam.id}>
+                          <TableCell>{requestedExam.name}</TableCell>
+                          <TableCell>{requestedExam.prescriptionDate}</TableCell>
+                          <TableCell>{requestedExam.expectedDate || "-"}</TableCell>
+                          <TableCell>{getPriorityBadge(requestedExam.priority || "normal")}</TableCell>
+                          <TableCell>{requestedExam.facility || "-"}</TableCell>
                           <TableCell className="flex gap-1">
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => handleUpdateExamStatus(exam.id, "pending")}
+                              onClick={() => handleUpdateExamStatus(requestedExam.id, "pending")}
                               title="Marquer comme en attente"
                             >
                               <Clock className="h-4 w-4 text-yellow-500" />
@@ -396,7 +405,7 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => handleRemoveExam(exam.id)}
+                              onClick={() => handleRemoveExam(requestedExam.id)}
                               title="Supprimer"
                             >
                               <Trash2 className="h-4 w-4 text-red-500" />
@@ -419,7 +428,7 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
               </Button>
             </div>
 
-            {formData.exams.filter((e) => e.status === "pending").length > 0 ? (
+            {formData.requestedExams.filter((e) => e.status === "pending").length > 0 ? (
               <div className="rounded-md border">
                 <Table>
                   <TableHeader>
@@ -432,19 +441,19 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {formData.exams
+                    {formData.requestedExams
                       .filter((e) => e.status === "pending")
-                      .map((exam) => (
-                        <TableRow key={exam.id}>
-                          <TableCell>{exam.name}</TableCell>
-                          <TableCell>{exam.prescriptionDate}</TableCell>
-                          <TableCell>{exam.expectedDate || "-"}</TableCell>
-                          <TableCell>{getStatusBadge(exam.status)}</TableCell>
+                      .map((requestedExam) => (
+                        <TableRow key={requestedExam.id}>
+                          <TableCell>{requestedExam.name}</TableCell>
+                          <TableCell>{requestedExam.prescriptionDate}</TableCell>
+                          <TableCell>{requestedExam.expectedDate || "-"}</TableCell>
+                          <TableCell>{getStatusBadge(requestedExam.status)}</TableCell>
                           <TableCell className="flex gap-1">
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => handleAddResult(exam)}
+                              onClick={() => handleAddResult(requestedExam)}
                               title="Ajouter un résultat"
                             >
                               <FileText className="h-4 w-4 text-blue-500" />
@@ -453,7 +462,7 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => handleUpdateExamStatus(exam.id, "cancelled")}
+                              onClick={() => handleUpdateExamStatus(requestedExam.id, "cancelled")}
                               title="Annuler"
                             >
                               <AlertCircle className="h-4 w-4 text-red-500" />
@@ -473,7 +482,7 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
 
             <h3 className="text-lg font-medium mt-6">Résultats d&apos,examens</h3>
 
-            {formData.exams.filter((e) => e.status === "completed").length > 0 ? (
+            {formData.requestedExams.filter((e) => e.status === "completed").length > 0 ? (
               <div className="rounded-md border">
                 <Table>
                   <TableHeader>
@@ -487,20 +496,20 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {formData.exams
+                    {formData.requestedExams
                       .filter((e) => e.status === "completed")
-                      .map((exam) => (
-                        <TableRow key={exam.id}>
-                          <TableCell>{exam.name}</TableCell>
-                          <TableCell>{exam.prescriptionDate}</TableCell>
-                          <TableCell>{exam.completionDate || "-"}</TableCell>
-                          <TableCell>{getStatusBadge(exam.status)}</TableCell>
-                          <TableCell className="max-w-[300px] truncate">{exam.result || "-"}</TableCell>
+                      .map((requestedExam) => (
+                        <TableRow key={requestedExam.id}>
+                          <TableCell>{requestedExam.name}</TableCell>
+                          <TableCell>{requestedExam.prescriptionDate}</TableCell>
+                          <TableCell>{requestedExam.completionDate || "-"}</TableCell>
+                          <TableCell>{getStatusBadge(requestedExam.status)}</TableCell>
+                          <TableCell className="max-w-[300px] truncate">{requestedExam.result || "-"}</TableCell>
                           <TableCell>
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => handleRemoveExam(exam.id)}
+                              onClick={() => handleRemoveExam(requestedExam.id)}
                               title="Supprimer"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -526,41 +535,61 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
                 id="paraclinicalConclusion"
                 placeholder="Interprétez les résultats des examens paracliniques et leur signification clinique"
                 className="min-h-[150px]"
+                value={formData.paraclinicalConclusion ?? ""} // Add controlled value
+                onChange={handleConclusionChange} // Add onChange handler
               />
             </div>
           </TabsContent>
         </Tabs>
 
         {/* Dialog pour ajouter un résultat d'examen */}
-        <Dialog open={isResultDialogOpen} onOpenChange={setIsResultDialogOpen}>
+        <Dialog
+          open={isResultDialogOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              setSelectedExam(null)
+            }
+            setIsResultDialogOpen(open)
+          }}
+        >
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Ajouter un résultat d&apos,examen</DialogTitle>
+              <DialogTitle>Ajouter un résultat d'examen</DialogTitle>
               <DialogDescription>{selectedExam?.name}</DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="completionDate">Date de réalisation</Label>
-                <Input
-                  id="completionDate"
-                  type="date"
-                  value={selectedExam?.completionDate || new Date().toISOString().split("T")[0]}
-                  onChange={(e) =>
-                    setSelectedExam(selectedExam ? { ...selectedExam, completionDate: e.target.value } : null)
-                  }
-                />
+            {selectedExam && (
+              <div className="grid gap-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="completionDate">Date de réalisation</Label>
+                  <Input
+                    id="completionDate"
+                    type="date"
+                    value={selectedExam?.completionDate ?? new Date().toISOString().split("T")[0]}
+                    onChange={(e) =>
+                      setSelectedExam({
+                        ...selectedExam,
+                        completionDate: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="resultText">Résultat</Label>
+                  <Textarea
+                    id="resultText"
+                    placeholder="Saisissez le résultat de l'examen"
+                    className="min-h-[150px]"
+                    value={selectedExam?.result ?? ""}
+                    onChange={(e) =>
+                      setSelectedExam({
+                        ...selectedExam,
+                        result: e.target.value,
+                      })
+                    }
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="resultText">Résultat</Label>
-                <Textarea
-                  id="resultText"
-                  placeholder="Saisissez le résultat de l'examen"
-                  className="min-h-[150px]"
-                  value={selectedExam?.result || ""}
-                  onChange={(e) => setSelectedExam(selectedExam ? { ...selectedExam, result: e.target.value } : null)}
-                />
-              </div>
-            </div>
+            )}
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsResultDialogOpen(false)}>
                 Annuler
@@ -573,4 +602,3 @@ export default function ParaclinicalExams({ formData, updateFormData }: Paraclin
     </Card>
   )
 }
-

@@ -15,6 +15,7 @@ type FormSelectInputProps = {
   isSearchable?: boolean;
   isMultiple?: boolean;
   className?: string;
+  isLoading?: boolean; 
 };
 export default function FormSelectInput({
   options,
@@ -27,6 +28,7 @@ export default function FormSelectInput({
   isSearchable = true,
   isMultiple = false,
   className,
+  isLoading = false,
 }: FormSelectInputProps) {
   return (
     <div className={`form-select-input ${className}`}>

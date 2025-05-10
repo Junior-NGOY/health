@@ -122,7 +122,6 @@ export default function AdditionalAnamnesis({
       </CardHeader>
       <CardContent className="space-y-6">
         <Separator />
-        <Separator />
 
         <div className="space-y-2">
           <Label htmlFor="severity">Sévérité</Label>

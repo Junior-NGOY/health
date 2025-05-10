@@ -67,6 +67,7 @@ import {
   UserCog,
   Users
 } from "lucide-react";
+import { TooltipProvider } from "@/components/ui/tooltip";
 //import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 //import Logo from "@/components/logo";
 //import { useUserSession } from "@/store/auth";
@@ -178,6 +179,29 @@ const sidebarLinks = {
         {
           title: "Billing",
           url: "#"
+        },
+        {
+          title: "Limits",
+          url: "#"
+        }
+      ]
+    },
+    {
+      title: "Pharmacy",
+      url: "/dashboard/medications",
+      icon: UserCog,
+      items: [
+        {
+          title: "New",
+          url: "/dashboard/medications/new",
+        },
+        {
+          title: "List",
+          url: "/dashboard/medications/stock",
+        },
+        {
+          title: "Billing",
+          url: "/dashboard/medications"
         },
         {
           title: "Limits",
@@ -363,6 +387,7 @@ export default function AppSidebar() {
     avatar: data?.image ?? "/avatars/shadcn.jpg"
   }; */
   return (
+    <TooltipProvider delayDuration={0}>
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <SidebarMenu>
@@ -417,7 +442,7 @@ export default function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Enseignants</SidebarGroupLabel>
+          <SidebarGroupLabel>Personnel médical</SidebarGroupLabel>
           <SidebarMenu>
             {sidebarLinks.navMain.map((item) => (
               <Collapsible
@@ -512,6 +537,6 @@ export default function AppSidebar() {
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
-    </Sidebar>
+    </Sidebar> </TooltipProvider>
   );
 }
